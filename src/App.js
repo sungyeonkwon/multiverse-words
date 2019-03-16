@@ -50,8 +50,22 @@ class App extends Component{
       this.scene.add(this[cube])
     }
 
+    // add star
+    let radius = 2;
+    let widthSegments = 4;
+    let heightSegments = 4;
+    var geom= new THREE.SphereGeometry( radius, widthSegments, heightSegments );
+    var mat = new THREE.MeshStandardMaterial( {color: 0xff0000} );
+    this.sphere = new THREE.Mesh( geom, mat );
+    this.edges = new THREE.EdgesGeometry( geom );
+    this.line = new THREE.LineSegments( this.edges, new THREE.LineBasicMaterial( { color: 0x0000ff } ) );
+    this.scene.add( this.sphere );
+    this.scene.add( this.line );
+    console.log(this.sphere)
+
+
     //ADD LIGHT
-    this.light = new THREE.DirectionalLight( 0xffffff, 5.0 );
+    this.light = new THREE.AmbientLight( 0xffffff, 5.0 );
     this.light.position.set( 10, 10, 10 ); // move the light back and up a bit
     this.scene.add( this.light );
 
@@ -76,11 +90,14 @@ class App extends Component{
 
   animate = () => {
 
-    for (let i = 0; i < 10 ; i++){
-      let cube = 'cube' + i
-      this[cube].rotation.x += 0.01
-      this[cube].rotation.y += 0.01
-    }
+    // for (let i = 0; i < 10 ; i++){
+    //   let cube = 'cube' + i
+    //   this[cube].rotation.x += 0.01
+    //   this[cube].rotation.y += 0.01
+    // }
+    //
+    // this.sphere.position.x += 0.01
+    // this.line.position.x += 0.01
 
      this.renderScene()
      this.frameId = window.requestAnimationFrame(this.animate)
