@@ -40,3 +40,8 @@ input {
   bottom:80px;
   left: calc(100vw / 2)
 }
+
+.universe {
+  width:100vw;
+  height:100vh;
+}

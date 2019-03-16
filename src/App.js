@@ -16,8 +16,11 @@ class App extends Component{
   componentDidMount(){
     const width = this.mount.clientWidth
     const height = this.mount.clientHeight
+
     //ADD SCENE
     this.scene = new THREE.Scene()
+    this.scene.background = new THREE.Color('lightblue')
+
     //ADD CAMERA
     this.camera = new THREE.PerspectiveCamera(
       75,
@@ -26,62 +29,102 @@ class App extends Component{
       1000
     )
     this.camera.position.z = 4
+
     //ADD RENDERER
     this.renderer = new THREE.WebGLRenderer({ antialias: true })
     this.renderer.setClearColor('#000000')
     this.renderer.setSize(width, height)
     this.mount.appendChild(this.renderer.domElement)
+
     //ADD CUBE
     const geometry = new THREE.BoxGeometry(1, 1, 1)
-    const material = new THREE.MeshBasicMaterial({ color: '#433F81'     })
+    const material = new THREE.MeshStandardMaterial({ color: '#433F81' })
     this.cube = new THREE.Mesh(geometry, material)
+    // console.log("cube", this.cube)
+    // console.log("geometry", geometry)
     this.scene.add(this.cube)
-this.start()
-  }
-componentWillUnmount(){
-    this.stop()
-    this.mount.removeChild(this.renderer.domElement)
-  }
-start = () => {
-    if (!this.frameId) {
-      this.frameId = requestAnimationFrame(this.animate)
+
+
+    // ADD starsGeometry
+
+    //This will add a starfield to the background of a scene
+    this.starsGeometry = new THREE.Geometry();
+
+    for ( var i = 0; i < 10000; i ++ ) {
+    	let star = new THREE.Vector3();
+    	star.x = THREE.Math.randFloatSpread( 100 );
+    	star.y = THREE.Math.randFloatSpread( 100 );
+    	star.z = THREE.Math.randFloatSpread( 100 );
+    	this.starsGeometry.vertices.push( star );
+
     }
-  }
-stop = () => {
-    cancelAnimationFrame(this.frameId)
-  }
-animate = () => {
-   this.cube.rotation.x += 0.01
-   this.cube.rotation.y += 0.01
-   this.renderScene()
-   this.frameId = window.requestAnimationFrame(this.animate)
- }
-renderScene = () => {
-  this.renderer.render(this.scene, this.camera)
-}
 
-inputChangedHandler = (event) => {
-  this.setState({userInput: event.target.value})
-}
+    this.starsMaterial = new THREE.PointsMaterial( { color: 0x195910 } );
+    this.starField = new THREE.Points( this.starsGeometry, this.starsMaterial );
+    this.scene.add( this.starField );
 
-keyPressedHandler = (event) => {
-  let key = event.keyCode || event.which;
 
-  if (key === 13){
-    let userAnswer = event.target.value.toLowerCase();
-    this.setState({userAnswer:userAnswer}, function(){
-      console.log("entered useranswer", this.state.userAnswer)
-    })
+
+    //ADD LIGHT
+    this.light = new THREE.DirectionalLight( 0xffffff, 5.0 );
+    this.light.position.set( 10, 10, 10 ); // move the light back and up a bit
+    this.scene.add( this.light );
+
+
+    this.start()
   }
 
-}
+  componentWillUnmount(){
+      this.stop()
+      this.mount.removeChild(this.renderer.domElement)
+    }
 
-render(){
+  start = () => {
+      if (!this.frameId) {
+        this.frameId = requestAnimationFrame(this.animate)
+      }
+    }
+
+  stop = () => {
+      cancelAnimationFrame(this.frameId)
+    }
+
+  animate = () => {
+     this.cube.rotation.x += 0.01
+     this.cube.rotation.y += 0.01
+     this.renderScene()
+     this.frameId = window.requestAnimationFrame(this.animate)
+   }
+
+  renderScene = () => {
+    this.renderer.render(this.scene, this.camera)
+  }
+
+  inputChangedHandler = (event) => {
+    this.setState({userInput: event.target.value})
+  }
+
+  keyPressedHandler = (event) => {
+    let key = event.keyCode || event.which;
+
+    if (key === 13){
+      let userAnswer = event.target.value.toLowerCase();
+      this.setState({
+        userAnswer:userAnswer,
+        userInput:''
+      }, function(){
+        console.log("entered useranswer", this.state.userAnswer)
+      })
+    }
+
+  }
+
+  render(){
     return(
       <div className="App">
         <Layout>
         <div
-          style={{ width: '400px', height: '400px' }}
+          className="universe"
           ref={(mount) => { this.mount = mount }}
         />
         <input
@@ -93,8 +136,9 @@ render(){
         </Layout>
       </div>
     )
-  }
+    }
 }
+
 export default App
 
 
