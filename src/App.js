@@ -28,7 +28,7 @@ class App extends Component{
       0.1,
       1000
     )
-    this.camera.position.z = 4
+    this.camera.position.z = 10
 
     //ADD RENDERER
     this.renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -39,31 +39,16 @@ class App extends Component{
     //ADD CUBE
     const geometry = new THREE.BoxGeometry(1, 1, 1)
     const material = new THREE.MeshStandardMaterial({ color: '#433F81' })
-    this.cube = new THREE.Mesh(geometry, material)
-    // console.log("cube", this.cube)
-    // console.log("geometry", geometry)
-    this.scene.add(this.cube)
-
-
-    // ADD starsGeometry
-
-    //This will add a starfield to the background of a scene
-    this.starsGeometry = new THREE.Geometry();
-
-    for ( var i = 0; i < 10000; i ++ ) {
-    	let star = new THREE.Vector3();
-    	star.x = THREE.Math.randFloatSpread( 100 );
-    	star.y = THREE.Math.randFloatSpread( 100 );
-    	star.z = THREE.Math.randFloatSpread( 100 );
-    	this.starsGeometry.vertices.push( star );
-
+    for (let i = 0; i < 10 ; i++){
+      let cube = 'cube' + i
+      this[cube] = new THREE.Mesh(geometry, material)
+      this[cube].position.set(
+        THREE.Math.randInt( -5, 5),
+        THREE.Math.randInt( -5, 5),
+        THREE.Math.randInt( -5, 5)
+      )
+      this.scene.add(this[cube])
     }
-
-    this.starsMaterial = new THREE.PointsMaterial( { color: 0x195910 } );
-    this.starField = new THREE.Points( this.starsGeometry, this.starsMaterial );
-    this.scene.add( this.starField );
-
-
 
     //ADD LIGHT
     this.light = new THREE.DirectionalLight( 0xffffff, 5.0 );
@@ -90,8 +75,13 @@ class App extends Component{
     }
 
   animate = () => {
-     this.cube.rotation.x += 0.01
-     this.cube.rotation.y += 0.01
+
+    for (let i = 0; i < 10 ; i++){
+      let cube = 'cube' + i
+      this[cube].rotation.x += 0.01
+      this[cube].rotation.y += 0.01
+    }
+
      this.renderScene()
      this.frameId = window.requestAnimationFrame(this.animate)
    }
