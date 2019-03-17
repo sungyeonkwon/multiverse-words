@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "json-loader": "^0.5.7",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-scripts": "2.1.8",
-    "three": "^0.102.1"
+    "three": "^0.102.1",
+    "three-orbitcontrols": "^2.102.1"
   },
   "scripts": {
     "start": "react-scripts start",

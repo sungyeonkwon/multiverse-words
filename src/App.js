@@ -1,16 +1,49 @@
 import React, { Component } from 'react';
 import * as THREE from 'three';
-
+import OrbitControls from 'three-orbitcontrols'
 import Layout from './components/Layout';
-
 import './App.css';
 
+
+// global variables
+const skyboxPath = process.env.PUBLIC_URL + '/skybox/';
+
+const testData = {
+  a: {
+    a: 'c',
+    b: 'f',
+    c: 'd'
+  },
+  b: {
+    a: 'c',
+    b: 'f',
+    c: 'd'
+  },
+  c: {
+    a: 'c',
+    b: 'f',
+    c: {
+      a: 'c',
+      b: 'f',
+      c: 'd'
+    }
+  },
+  d: {
+    e: 'f'
+  },
+  f: {
+    a: 'c',
+    b: 'f',
+  }
+}
 
 class App extends Component{
 
   state = {
     userInput: '',
     userAnswer: '',
+    letterSeq: [],
+    wordObj: testData,
   }
 
   componentDidMount(){
@@ -36,6 +69,25 @@ class App extends Component{
     this.renderer.setSize(width, height)
     this.mount.appendChild(this.renderer.domElement)
 
+    //ADD controls
+    this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+
+    //ADD SKYBOX
+    var skyGeom = new THREE.CubeGeometry( 1000, 1000, 1000 );
+    var skyMaterials =
+    [
+      new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader( ).load( `${skyboxPath}city_ft.png` ), side: THREE.DoubleSide } ), // Right side
+      new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader( ).load( `${skyboxPath}city_bk.png` ), side: THREE.DoubleSide } ), // Left side
+      new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader( ).load( `${skyboxPath}city_up.png` ), side: THREE.DoubleSide } ), // Top side
+      new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader( ).load( `${skyboxPath}city_dn.png` ), side: THREE.DoubleSide } ), // Bottom side
+      new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader( ).load( `${skyboxPath}city_rt.png` ), side: THREE.DoubleSide } ), // Front side
+      new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader( ).load( `${skyboxPath}city_lf.png` ), side: THREE.DoubleSide } ) // Back side
+    ];
+    // Create a MeshFaceMaterial, which allows the cube to have different materials on each face
+    var skyMat = new THREE.MeshFaceMaterial( skyMaterials );
+    var sky = new THREE.Mesh( skyGeom, skyMat );
+    this.scene.add( sky );
+
     //ADD CUBE
     const geometry = new THREE.BoxGeometry(1, 1, 1)
     const material = new THREE.MeshStandardMaterial({ color: '#433F81' })
@@ -52,8 +104,8 @@ class App extends Component{
 
     // add star
     let radius = 2;
-    let widthSegments = 4;
-    let heightSegments = 4;
+    let widthSegments =1;
+    let heightSegments = 1;
     var geom= new THREE.SphereGeometry( radius, widthSegments, heightSegments );
     var mat = new THREE.MeshStandardMaterial( {color: 0xff0000} );
     this.sphere = new THREE.Mesh( geom, mat );
@@ -63,12 +115,10 @@ class App extends Component{
     this.scene.add( this.line );
     console.log(this.sphere)
 
-
     //ADD LIGHT
     this.light = new THREE.AmbientLight( 0xffffff, 5.0 );
     this.light.position.set( 10, 10, 10 ); // move the light back and up a bit
     this.scene.add( this.light );
-
 
     this.start()
   }
@@ -114,6 +164,13 @@ class App extends Component{
   keyPressedHandler = (event) => {
     let key = event.keyCode || event.which;
 
+    // if key is a letter... fire another function which handles the input
+    if ((key >= 97 && key <= 122) || (key >= 65 && key <= 90)){
+      this.dicFinder(key)
+    } else {
+      console.log("TO DO: implement error message")
+    }
+
     if (key === 13){
       let userAnswer = event.target.value.toLowerCase();
       this.setState({
@@ -123,7 +180,21 @@ class App extends Component{
         console.log("entered useranswer", this.state.userAnswer)
       })
     }
+  }
 
+  dicFinder = (keycode) => {
+    let letter = String.fromCharCode(keycode)
+
+    if (this.state.wordObj[letter]){
+      this.setState({
+        letterSeq: [...this.state.letterSeq, letter],
+        wordObj: this.state.wordObj[letter],
+      }, function(){
+        console.log("[dicFinder] wordObj is: ", this.state.wordObj)
+      })
+    } else {
+      console.log("TODO: [dicFinder] there is no word further")
+    }
   }
 
   render(){
@@ -147,32 +218,3 @@ class App extends Component{
 }
 
 export default App
-
-
-
-
-
-
-// class App extends Component {
-//   render() {
-//     return (
-//       <div className="App">
-//         <header className="App-header">
-//           <p>
-//             Edit <code>src/App.js</code> and save to reload.
-//           </p>
-//           <a
-//             className="App-link"
-//             href="https://reactjs.org"
-//             target="_blank"
-//             rel="noopener noreferrer"
-//           >
-//             Learn React
-//           </a>
-//         </header>
-//       </div>
-//     );
-//   }
-// }
-//
-// export default App;
