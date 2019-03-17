@@ -25,7 +25,10 @@ const testData = {
     c: {
       a: 'c',
       b: 'f',
-      c: 'd'
+      c: {
+        a: 'c',
+        b: 'f',
+      }
     }
   },
   d: {
@@ -34,7 +37,8 @@ const testData = {
   f: {
     a: 'c',
     b: 'f',
-  }
+  },
+  z: 'd'
 }
 
 class App extends Component{
@@ -61,7 +65,7 @@ class App extends Component{
       0.1,
       1000
     )
-    this.camera.position.z = 10
+    this.camera.position.z = 30
 
     //ADD RENDERER
     this.renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -91,7 +95,8 @@ class App extends Component{
     //ADD CUBE
     const geometry = new THREE.BoxGeometry(1, 1, 1)
     const material = new THREE.MeshStandardMaterial({ color: '#433F81' })
-    for (let i = 0; i < 10 ; i++){
+
+    for (let i = 0; i < 6 ; i++){
       let cube = 'cube' + i
       this[cube] = new THREE.Mesh(geometry, material)
       this[cube].position.set(
@@ -102,21 +107,76 @@ class App extends Component{
       this.scene.add(this[cube])
     }
 
-    // add star
-    let radius = 2;
-    let widthSegments =1;
+    // ADD STAR
+    let radius = 1;
+    let widthSegments = 1;
     let heightSegments = 1;
     var geom= new THREE.SphereGeometry( radius, widthSegments, heightSegments );
     var mat = new THREE.MeshStandardMaterial( {color: 0xff0000} );
-    this.sphere = new THREE.Mesh( geom, mat );
-    this.edges = new THREE.EdgesGeometry( geom );
-    this.line = new THREE.LineSegments( this.edges, new THREE.LineBasicMaterial( { color: 0x0000ff } ) );
-    this.scene.add( this.sphere );
-    this.scene.add( this.line );
-    console.log(this.sphere)
+
+    for (let i = 0; i < 3000; i++ ){
+      let star = 'star' + i
+      let starEdge = 'starEdge' + i
+      let starLine = 'starLine' + i
+      let posX = THREE.Math.randInt( -20, 20)
+      let posY = THREE.Math.randInt( -20, 20)
+      let posZ = THREE.Math.randInt( -20, 20)
+
+      this[star] = new THREE.Mesh( geom, mat );
+      this[star].position.set( posX, posY, posZ)
+      this[starEdge] = new THREE.EdgesGeometry( geom );
+      this[starLine] = new THREE.LineSegments( this[starEdge], new THREE.LineBasicMaterial( { color: 0x0000ff } ) );
+      this[starLine].position.set( posX, posY, posZ)
+
+      this.scene.add( this[star] );
+      this.scene.add( this[starLine] );
+
+    }
+    // this.sphere = new THREE.Mesh( geom, mat );
+    // this.edges = new THREE.EdgesGeometry( geom );
+    // this.line = new THREE.LineSegments( this.edges, new THREE.LineBasicMaterial( { color: 0x0000ff } ) );
+    // this.scene.add( this.sphere );
+    // this.scene.add( this.line );
+
+
+
+
+    // count all the objects and
+    // make id name
+    // and render it
+    let data = this.state.wordObj
+    let count = 0;
+
+    function flattenObject(ob) {
+        let toReturn = {};
+        for (let i in ob) {
+            if (!ob.hasOwnProperty(i)) continue; // if the ob is the end
+
+            if ((typeof ob[i]) == 'object' && ob[i] !== null) {
+                let flatObject = flattenObject(ob[i]); // child ob is the recursive version of the iteration
+                for (let j in flatObject) {
+                    if (!flatObject.hasOwnProperty(j)) continue;
+                    toReturn[i + j] = flatObject[j];
+                }
+            } else {
+                toReturn[i] = ob[i];
+                count++;
+            }
+        }
+        return toReturn;
+    }
+
+    console.log(flattenObject(data));
+    console.log("count", count)
+
+
+
+
+
+
 
     //ADD LIGHT
-    this.light = new THREE.AmbientLight( 0xffffff, 5.0 );
+    this.light = new THREE.DirectionalLight( 0xffffff, 5.0 );
     this.light.position.set( 10, 10, 10 ); // move the light back and up a bit
     this.scene.add( this.light );
 
